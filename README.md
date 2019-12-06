@@ -2,7 +2,7 @@
 + Forward algorithm
 + Backward algorithm
 + Viterbi algorithm
-+ Baum-Walch algorithm (EM algorithm)
++ Baum-Welch algorithm (EM algorithm)
 
 # Requirements
 + numpy
