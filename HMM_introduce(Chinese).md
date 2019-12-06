@@ -1,10 +1,40 @@
-[toc]
+<a class="toc" id="table-of-contents"></a>
+# Table of Contents
++ [Hidden Markov Model (隐马尔科夫模型)](#1)
++ [定义](#2)
++ [基本问题](#3)
++ [前向算法](#4)
+	+ [算法流程](#4-1)
+	+ [实现代码](#4-2)
++ [后向算法](#5)
+	+ [算法流程](#5-1)
+	+ [实现代码](#5-2)
++ [Viterbi算法](#6)
+	+ [算法流程](#6-1)
+	+ [实现代码](#6-2)
++ [Baum-Walch 算法](#7)
+	+ [单观测序列](#7-1)
+	+ [多观测序列](#7-2)
+	+ [实现代码（单观测序列）](#7-3)
++ [符号总结](#8)
++ [hmmlearn](#9)
+	+ [安装](#9-1)
+	+ [使用 ](#9-2)
+	+ [常见错误](#9-3)
++ [参考资料](#10)
 
+
+<a class="toc" id ="1"></a>
 # Hidden Markov Model (隐马尔科夫模型)
+[Back to TOC](#table-of-contents)
+
 两种问题特征：
 + 基于序列的，比如时间序列，或者状态序列
 + 两类数据，一类序列数据是可以观测到的，即观测序列；而另一类数据是不能观察到的，即隐藏状态序列，简称状态序列
+<a class="toc" id ="2"></a>
 # 定义
+[Back to TOC](#table-of-contents)
+
 假设$N$是可能的隐藏状态数，$M$是可能的观测状态数，定义
 $$
 \mathcal{Q}=\{q_1,q_2,\dots,q_N\},\mathcal{V}=\{v_1,v_2,\dots,v_M\}
@@ -31,11 +61,18 @@ $$
 $$
 \lambda=(A,B,\Pi)
 $$
+<a class="toc" id ="3"></a>
 # 基本问题
+[Back to TOC](#table-of-contents)
+
 + 1. 评估观察序列概率。给定模型$\lambda$和观测序列$\mathcal{O}$，计算在模型$\lambda$下该观测序列$\mathcal{O}$出现的概率$P(\mathcal{O}|\lambda)$。求解方法：前向后向算法
 + 2. 预测问题。给定观测序列$\mathcal{O}=\{o_1,o_2,\dots,o_T\}$和模型参数$\lambda=（A,B,\Pi)$，求解最有可能出现的**隐藏状态序列**。求解方法：Viterbi算法
 + 3. 模型参数学习问题。给定观测序列$\mathcal{O}=\{o_1,o_2,\dots,o_T\}$，求解模型参数$\lambda=（A,B,\Pi)$使得$P(\mathcal{O}|\lambda)$最大。求解方法：Baum-Walch算法(EM算法)
+<a class="toc" id ="4"></a>
 # 前向算法
+[Back to TOC](#table-of-contents)
+
+<a class="toc" id ="4-1"></a>
 ## 算法流程
 输入：观测序列$\mathcal{O}=\{o_1,o_2,\dots,o_T\}$，模型参数$\lambda=（A,B,\Pi)$
 输出：观测序列$P(O|\lambda)$
@@ -52,6 +89,7 @@ $$
 $$
 P(\mathcal{O}|\lambda)=\sum_i^N\alpha_T(i)
 $$
+<a class="toc" id ="4-2"></a>
 ## 实现代码
 ```python
 def HMMfwd(pi, a, b, obs):
@@ -79,7 +117,11 @@ def HMMfwd(pi, a, b, obs):
 ```python
 np.sum(alpha[:,-1])
 ```
+<a class="toc" id ="5"></a>
 # 后向算法
+[Back to TOC](#table-of-contents)
+
+<a class="toc" id ="5-1"></a>
 ## 算法流程
 输入：观测序列$\mathcal{O}=\{o_1,o_2,\dots,o_T\}$，模型参数$\lambda=（A,B,\Pi)$
 输出：观测序列$P(O|\lambda)$
@@ -96,6 +138,7 @@ $$
 $$
 P(\mathcal{O}|\lambda)=\sum_i^N\pi_iB_{i,o_1}\beta_1(i)
 $$
+<a class="toc" id ="5-2"></a>
 ## 实现代码
 ```python
 def HMMbwd(a, b, obs):
@@ -124,7 +167,11 @@ np.sum(pi*b[:,obs[0]]*beta[:,0])
 ```
 
 
+<a class="toc" id ="6"></a>
 # Viterbi算法
+[Back to TOC](#table-of-contents)
+
+<a class="toc" id ="6-1"></a>
 ## 算法流程
 输入：观测序列$\mathcal{O}=\{o_1,o_2,\dots,o_T\}$，模型参数$\lambda=（A,B,\Pi)$
 输出：最有可能的有隐状态序列 $\mathcal{I}^*=\{i^{*}_1,i^{*}_2,\dots,i^{*}_T\}$
@@ -151,6 +198,7 @@ $$
 i^*_t=\Phi_{t+1}(i^*_{t+1})
 $$
 + 最终得到最有可能的隐藏状态序列$\mathcal{I}^*=\{i^{*}_1,i^{*}_2,\dots,i^{*}_T\}$
+<a class="toc" id ="6-2"></a>
 ## 实现代码
 ```python
 def Viterbi(pi, a, b, obs):
@@ -184,7 +232,11 @@ def Viterbi(pi, a, b, obs):
 ```
 最后解码得到的序列即为`path`
 
+<a class="toc" id ="7"></a>
 # Baum-Walch 算法
+[Back to TOC](#table-of-contents)
+
+<a class="toc" id ="7-1"></a>
 ## 单观测序列
 输入：$1$个观测序列样本$\mathcal{O}=\{o_1,o_2,\dots,o_T\}$
 输出：模型参数$\lambda=（A,B,\Pi)$
@@ -213,6 +265,7 @@ $$
 \end{array}
 $$
 上式中的$I(o_{t}=v_{j})$表示当时刻$t$观测状态为 $v_k$ 时，$I(o_{t}=v_{j})=1$，否则$I(o_{t} = v_{j})=0$
+<a class="toc" id ="7-2"></a>
 ## 多观测序列
 输入：$D$个观测序列样本$\{\mathcal{O}_1,\mathcal{O}_2,\dots,\mathcal{O}_D\}$，其中$\mathcal{O}_d=\{o_1,o_2,\dots,o_T\},d=1,2,\dots,D$
 输出：模型参数$\lambda =（A,B,\Pi)$
@@ -239,6 +292,7 @@ $$
 \end{array}
 $$
 同样的，上式中的$I(o_{t}=v_{j})$表示当时刻$t$观测状态为 $v_k$ 时，$I(o_{t}=v_{j})=1$，否则$I(o_{t} = v_{j})=0$
+<a class="toc" id ="7-3"></a>
 ## 实现代码（单观测序列）
 ```python
 def BaumWelch(obs, n_states, n_obs, pi=None, a=None, b=None, tol=1e-2, n_iter=10):
@@ -297,7 +351,10 @@ def BaumWelch(obs, n_states, n_obs, pi=None, a=None, b=None, tol=1e-2, n_iter=10
     return pi, a, b
 ```
 
+<a class="toc" id ="8"></a>
 # 符号总结
+[Back to TOC](#table-of-contents)
+
 |符号|解释|符号|解释|
 |:-:|:-:|:-:|:-:|
 |$N$|可能的隐藏状态数|$M$|可能的观测状态数|
@@ -311,12 +368,17 @@ def BaumWelch(obs, n_states, n_obs, pi=None, a=None, b=None, tol=1e-2, n_iter=10
 |$I(o_{t}=v_{j})$|当时刻$t$观测状态为 $v_k$ 时，$I(o_{t}=v_{j})=1$，否则$I(o_{t} = v_{j})=0$|
 
 
+<a class="toc" id ="9"></a>
 # hmmlearn
+[Back to TOC](#table-of-contents)
+
+<a class="toc" id ="9-1"></a>
 ## 安装
 ```bash
 pip install hmmlearn
 ```
 注意：前提是要有gcc编译器，因为部分源代码由C编译而成
+<a class="toc" id ="9-2"></a>
 ## 使用 
 这里只介绍通用的离散HMM模型的使用（序列是离散的）
 + 建立一个HMM模型
@@ -385,6 +447,7 @@ model.decode(obs.T)
 model.fit(obs.T)
 ```
 
+<a class="toc" id ="9-3"></a>
 ## 常见错误
 + **Expected 2D array, got 1D array instead**
 输入的`obs`序列需要是一个[n_sample,n_obs]的二维数组，如果只有一个观测序列，需要将其扩展为二维，使用 ``np.atleast_2d(obs)``
@@ -411,7 +474,10 @@ def _compute_log_likelihood(self, X):
         return np.log(self.emissionprob_ + 1e-10)[:, np.concatenate(X)].T
 ```
 
+<a class="toc" id ="10"></a>
 # 参考资料
+[Back to TOC](#table-of-contents)
+
 + [刘建平：隐马尔科夫模型HMM](https://www.cnblogs.com/pinard/p/6945257.html)
 + [MarslandMLAlgo](https://github.com/alexsosn/MarslandMLAlgo/blob/master/Ch16/HMM.py)
 + [hmmlearn](https://github.com/hmmlearn/hmmlearn)

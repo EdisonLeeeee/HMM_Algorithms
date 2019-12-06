@@ -124,7 +124,7 @@ def BaumWelch(obs,
     
     Parameters
     ----------
-    obs: observation sequence [o_1, o_2, ..., o_N]  
+    obs: observation sequence [o_1, o_2, ..., o_T]  
         (T, )
     n_states: number of states
         int
@@ -225,9 +225,9 @@ def sample(T, pi, a, b):
         
     Returns
     -------
-    obs: observation sequence [o_1, o_2, ..., o_N]  
+    obs: observation sequence [o_1, o_2, ..., o_T]  
         (T, )
-    states: hidden states [s_1, s_2, ..., s_N]  
+    states: hidden states [s_1, s_2, ..., s_T]  
         (T, )        
     '''
     def drawFrom(probs):
